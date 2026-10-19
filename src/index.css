@@ -1,6 +1,13 @@
-*{
-padding:0;
-margin:0;
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
 
-
+#home {
+    min-height: 100vh;
+    background-image: url("https://img.magnific.com/free-photo/young-businesswoman-smiling-camera_74855-1682.jpg?semt=ais_hybrid&w=740&q=80");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
