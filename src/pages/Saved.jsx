@@ -1,152 +1,153 @@
-import React, { useState } from "react";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import TextField from "@mui/material/TextField";
-import InputAdornment from "@mui/material/InputAdornment";
-import SearchIcon from "@mui/icons-material/Search";
+import React, { useEffect, useState,useMemo } from 'react'
+import Typography from '@mui/material/Typography'
+import { styled } from '@mui/material/styles';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell, { tableCellClasses } from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
+import SearchIcon from "@mui/icons-material/Search"
+import InputAdornment from '@mui/material/InputAdornment';
+import { viewAllResumesAPI, viewAllResumesDelete } from '../services/apiServices';
+import { Link } from 'react-router-dom';
 
-const rows = [
-  {
-    name: "Frozen yoghurt",
-    calories: 159,
-    fat: 6,
-    carbs: 24,
-    protein: 4,
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.common.black,
+    color: theme.palette.common.white,
   },
-  {
-    name: "Ice cream sandwich",
-    calories: 237,
-    fat: 9,
-    carbs: 37,
-    protein: 4.3,
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
   },
-  {
-    name: "Eclair",
-    calories: 262,
-    fat: 16,
-    carbs: 24,
-    protein: 6,
+}));
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  '&:nth-of-type(odd)': {
+    backgroundColor: theme.palette.action.hover,
   },
-  {
-    name: "Cupcake",
-    calories: 305,
-    fat: 3.7,
-    carbs: 67,
-    protein: 4.3,
+  // hide last border
+  '&:last-child td, &:last-child th': {
+    border: 0,
   },
-  {
-    name: "Gingerbread",
-    calories: 356,
-    fat: 16,
-    carbs: 49,
-    protein: 3.9,
-  },
-];
+}));
+
+
+
+
+
 
 function Saved() {
-  const [search, setSearch] = useState("");
 
-  const filteredRows = rows.filter((row) =>
-    row.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const [searchkey,setSearchkey]=useState('')
+  const [resume,setResume]=useState([])
+  const[dummyResume,setDummyResume]=useState([])
+ const searchOutput= useMemo(()=>{
+dummyResume.filter(item=>item.job.includes(searchkey))
+ },[searchkey])
+  const getAllResumes=async()=>{
+    try {
+      const response=await viewAllResumesAPI()
+      console.log(response);
+      setResume(response.data)
+      setDummyResume(response.data)
+    } catch (error) {
+      console.log(error);
+      
+    }
+  }
+
+  useEffect(()=>{
+    getAllResumes()
+  },[])
+
+  const deleteResume= async(id)=>{
+const response = await viewAllResumesDelete(id)
+console.log(response);
+getAllResumes()
+
+  }
 
   return (
-    <Box sx={{ p: 4, backgroundColor: "#fff", minHeight: "100vh" }}>
-      <Typography
-        variant="h4"
-        align="center"
-        sx={{ fontWeight: "bold", mb: 4 }}
-      >
-        All Saved Resumes
+    <div>
+       <Typography sx={{
+        textAlign:"center",
+        fontSize:"50px",
+        fontWeight:"bold",
+        mt:8,
+        mb:8
+      }}>All Saved Resumes</Typography>
+
+      <Typography sx={{
+        px:10,
+        textAlign:"center",
+        fontSize:"20px",
+        fontWeight:"bold",
+        mt:8,
+        mb:8
+      }}>
+        all resumes submitted to the platform in one place,allowing administrators to efficently view,search,filtetr and manage candidate profiles
+        It provides a quick overview of availablle candidates and their key details,making the recruitment and candidate selection process more organized
       </Typography>
 
-      <Typography sx={{ fontSize: 13, mb: 3, color: "#333" }}>
-        All resumes submitted to the platform, allowing administrators or
-        recruiters to efficiently view, search, filter, and manage candidate
-        profiles. It provides a quick overview of available candidates and
-        their key details, making the recruitment and candidate-selection
-        process more organized and efficient.
-      </Typography>
-
-      <Box sx={{ display: "flex", justifyContent: "center", mb: 4 }}>
-        <TextField
-          size="small"
-          placeholder="Search Candidate by their Job Roles"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          sx={{ width: 320 }}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <SearchIcon fontSize="small" />
-              </InputAdornment>
-            ),
+      <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            mb: 8
           }}
-        />
-      </Box>
+        >
+          <TextField
+            placeholder="Search Candidate by their Job Roles"
+            // value={search}
+            onChange={(e) => setSearchkey(e.target.value)}
+            sx={{ width: "60%" }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <SearchIcon />
+                </InputAdornment>
+              )
+            }}
+          />
+        </Box>
 
-      <TableContainer component={Paper} elevation={0}>
-        <Table size="small" aria-label="dessert nutrition table">
-          <TableHead>
-            <TableRow sx={{ backgroundColor: "#212529" }}>
-              <TableCell sx={{ color: "white", fontWeight: "bold" }}>
-                Dessert (100g serving)
-              </TableCell>
-              <TableCell align="right" sx={{ color: "white", fontWeight: "bold" }}>
-                Calories
-              </TableCell>
-              <TableCell align="right" sx={{ color: "white", fontWeight: "bold" }}>
-                Fat (g)
-              </TableCell>
-              <TableCell align="right" sx={{ color: "white", fontWeight: "bold" }}>
-                Carbs (g)
-              </TableCell>
-              <TableCell align="right" sx={{ color: "white", fontWeight: "bold" }}>
-                Protein (g)
-              </TableCell>
-            </TableRow>
-          </TableHead>
 
-          <TableBody>
-            {filteredRows.map((row) => (
-              <TableRow
-                key={row.name}
-                hover
-                sx={{
-                  "&:last-child td, &:last-child th": {
-                    border: 0,
-                  },
-                }}
-              >
-                <TableCell component="th" scope="row">
-                  {row.name}
-                </TableCell>
-                <TableCell align="right">{row.calories}</TableCell>
-                <TableCell align="right">{row.fat}</TableCell>
-                <TableCell align="right">{row.carbs}</TableCell>
-                <TableCell align="right">{row.protein}</TableCell>
-              </TableRow>
-            ))}
+       <TableContainer component={Paper}>
+      <Table sx={{ minWidth: 700,}} aria-label="customized table">
+        <TableHead>
+          <TableRow>
+            <StyledTableCell>ID</StyledTableCell>
+            <StyledTableCell align="right">Name</StyledTableCell>
+            <StyledTableCell align="right">JOB ROLE</StyledTableCell>
+            <StyledTableCell align="right">ACTION</StyledTableCell>
+          </TableRow>
+        </TableHead>
+        
+        <TableBody>
+          {resume.map((item,index) => (
+            <StyledTableRow key={item.id}>
+               <StyledTableCell component="th" scope="row">
+                {index+1}
+              </StyledTableCell>
+             <Link to={`/resumes/${item.id}`}>
+              <StyledTableCell component="th" scope="row">
+                {item.fullName}
+              </StyledTableCell>
+             </Link>
+              <StyledTableCell align="right">{item.job}</StyledTableCell>
+              <StyledTableCell align="right"><button onClick={()=>deleteResume(item.id)}>Delete</button></StyledTableCell>
 
-            {filteredRows.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={5} align="center">
-                  No results found
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </Box>
-  );
+            </StyledTableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+    </div>
+  )
 }
 
-export default Saved;
+export default Saved

@@ -1,71 +1,83 @@
-
-import React, { useState, useEffect } from "react";
-import {
-  Box,
-  Typography,
-  TextField,
-  Button,
-  MenuItem,
-  Modal,
-} from "@mui/material";
-import { editResumeAPI } from "../services/apiServices";
+import React, { useState } from 'react'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+import TextField from '@mui/material/TextField'
+import Button from '@mui/material/Button'
+import MenuItem from '@mui/material/MenuItem'
+import Modal from '@mui/material/Modal'
+import { editResumeAPI } from '../services/apiServices'
+// import { ImCross } from "react-icons/im";
+import ClearIcon from '@mui/icons-material/Clear';
+import { useRef } from 'react';
 
 function Edit({ resume, setResume }) {
-  const [open, setOpen] = useState(false);
-  const [resume, setResume] = useState({});
+  console.log(resume);
 
-  useEffect(() => {
-    if (resume) {
-      setResume({ ...resume });
+  const inputRef = useRef(null);
+
+  const [open, setOpen] = useState(false)
+
+  const handleAddSkills = (skill) => {
+    console.log(skill);
+    if (skill) {
+      if (resume?.skills?.includes(skill)) {
+        alert("skill already exists")
+      }
+      else {
+        setResume({ ...resume, skills: [...resume?.skills, skill] })
+      }
+      inputRef.current.value = ""
+    } else {
+      alert("please fill a valid data")
     }
-  }, [resume]);
+  }
 
-  const handleOpen = () => {
-    setResume({ ...resume });
-    setOpen(true);
-  };
+  const handleDeleteSkills = (skill) => {
+    setResume({ ...resume, skills: resume.skills.filter(item => item != skill) })
+  }
+
 
   const handleClose = () => {
-    setOpen(false);
-  };
+    setOpen(false)
+  }
+  const handleOpen = () => setOpen(true);
 
-  const handleUpdateResume = async() => 
-    {
+  const handleUpdateResume = async () => {
+    const response = await editResumeAPI(resume.id, resume)
+    console.log(response);
 
-      const response= await editResumeAPI(resume.id,resume)
-      console.log(response);
-      
-    
-    };
-
+  }
 
 
   return (
     <>
       <Button onClick={handleOpen}>Edit</Button>
-
-      <Modal open={open} onClose={handleClose}>
+      <Modal
+        open={open}
+        onClose={handleClose}
+      >
         <Box
           sx={{
-            width: "550px",
-            maxWidth: "90%",
-            maxHeight: "90vh",
-            overflowY: "auto",
-            backgroundColor: "white",
-            padding: "30px",
-            borderRadius: "4px",
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
+            width: '550px',
+            maxWidth: '90%',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            backgroundColor: 'white',
+            padding: '30px',
+            borderRadius: '4px',
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)'
           }}
         >
+
           <Box
             sx={{
-              backgroundColor: "#684f56",
-              color: "white",
-              padding: "14px",
-              marginBottom: "25px",
+              backgroundColor: '#684f56',
+              color: 'white',
+              padding: '14px',
+              marginBottom: '25px'
             }}
           >
             <Typography variant="h6">
@@ -73,261 +85,217 @@ function Edit({ resume, setResume }) {
             </Typography>
           </Box>
 
-          {/* Personal Details */}
-
-          <Typography variant="h5" sx={{ mb: 2, fontWeight: "bold" }}>
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: 'bold',
+              marginBottom: '20px'
+            }}
+          >
             Personal Details
           </Typography>
 
           <TextField
             label="Full Name"
-            name="fullName"
-            value={resume.fullName || ""}
-            onChange={(e) =>
-              setResume({
-                ...resume,
-                fullName: e.target.value,
-              })
-            }
+            placeholder="Enter your full name"
             variant="standard"
             fullWidth
-            sx={{ mb: 2 }}
+            value={resume?.fullName}
+            onChange={e => setResume({ ...resume, fullName: e.target.value })}
+            sx={{ marginBottom: '18px' }}
           />
 
           <TextField
             label="Location"
-            name="location"
-            value={resume.location || ""}
-            onChange={(e) =>
-              setResume({
-                ...resume,
-                location: e.target.value,
-              })
-            }
+            placeholder="Enter your location"
             variant="standard"
             fullWidth
-            sx={{ mb: 2 }}
+            value={resume?.location}
+            onChange={e => setResume({ ...resume, location: e.target.value })}
+            sx={{ marginBottom: '18px' }}
           />
 
           <TextField
             select
             label="Choose Job Title"
-            name="jobTitle"
-            value={resume.jobTitle || ""}
-            onChange={(e) =>
-              setResume({
-                ...resume,
-                jobTitle: e.target.value,
-              })
-            }
+            defaultValue=""
             variant="standard"
             fullWidth
-            sx={{ mb: 3 }}
+            //  value={resume.fullName}
+            // onChange={e=>setResume({...resume,fullName:e.target.value})}
+            sx={{ marginBottom: '30px' }}
           >
-            <MenuItem value="Frontend Developer">
+            <MenuItem value="">
+              Select Job Title
+            </MenuItem>
+
+            <MenuItem value="Developer">
               Frontend Developer
             </MenuItem>
 
-            <MenuItem value="UI/UX Designer">
+            <MenuItem value="Designer">
               UI/UX Designer
             </MenuItem>
 
-            <MenuItem value="Data Analyst">
+            <MenuItem value="Analyst">
               Data Analyst
-            </MenuItem>
-
-            <MenuItem value="Backend Developer">
-              Backend Developer
             </MenuItem>
           </TextField>
 
-          {/* Contact Details */}
-
-          <Typography variant="h5" sx={{ mb: 2, fontWeight: "bold" }}>
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: 'bold',
+              marginBottom: '20px'
+            }}
+          >
             Contact Details
           </Typography>
 
           <TextField
             label="Email"
-            name="email"
-            value={resume.email || ""}
-            onChange={(e) =>
-              setResume({
-                ...resume,
-                email: e.target.value,
-              })
-            }
+            placeholder="Enter your email"
             variant="standard"
             fullWidth
-            sx={{ mb: 2 }}
+            value={resume?.email}
+            onChange={e => setResume({ ...resume, email: e.target.value })}
+            sx={{ marginBottom: '18px' }}
           />
 
           <TextField
             label="Contact Number"
-            name="phone"
-            value={resume.phone || ""}
-            onChange={(e) =>
-              setResume({
-                ...resume,
-                phone: e.target.value,
-              })
-            }
+            placeholder="Enter your phone number"
             variant="standard"
             fullWidth
-            sx={{ mb: 2 }}
+            value={resume?.phone}
+            onChange={e => setResume({ ...resume, phone: e.target.value })}
+            sx={{ marginBottom: '18px' }}
           />
 
           <TextField
             label="LinkedIn Link"
-            name="linkedin"
-            value={resume.linkedin || ""}
-            onChange={(e) =>
-              setResume({
-                ...resume,
-                linkedin: e.target.value,
-              })
-            }
+            placeholder="Enter LinkedIn URL"
             variant="standard"
             fullWidth
-            sx={{ mb: 2 }}
+            value={resume?.linkedin}
+            onChange={e => setResume({ ...resume, linkedin: e.target.value })}
+            sx={{ marginBottom: '18px' }}
           />
 
           <TextField
-            label="GitHub Link"
-            name="github"
-            value={resume.github || ""}
-            onChange={(e) =>
-              setResume({
-                ...resume,
-                github: e.target.value,
-              })
-            }
+            label="Github Link"
+            placeholder="Enter Github URL"
             variant="standard"
             fullWidth
-            sx={{ mb: 3 }}
+            value={resume?.github}
+            onChange={e => setResume({ ...resume, github: e.target.value })}
+            sx={{ marginBottom: '30px' }}
           />
 
-          {/* Educational Details */}
-
-          <Typography variant="h5" sx={{ mb: 2, fontWeight: "bold" }}>
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: 'bold',
+              marginBottom: '20px'
+            }}
+          >
             Educational Details
           </Typography>
 
           <TextField
             label="Degree"
-            name="degree"
-            value={resume.degree || ""}
-            onChange={(e) =>
-              setResume({
-                ...resume,
-                degree: e.target.value,
-              })
-            }
+            placeholder="Enter your degree"
             variant="standard"
             fullWidth
-            sx={{ mb: 2 }}
+            value={resume?.degree}
+            onChange={e => setResume({ ...resume, degree: e.target.value })}
+            sx={{ marginBottom: '18px' }}
           />
 
           <TextField
             label="College / University"
-            name="college"
-            value={resume.college || ""}
-            onChange={(e) =>
-              setResume({
-                ...resume,
-                college: e.target.value,
-              })
-            }
+            placeholder="Enter college or university"
             variant="standard"
             fullWidth
-            sx={{ mb: 2 }}
+            value={resume?.college}
+            onChange={e => setResume({ ...resume, college: e.target.value })}
+            sx={{ marginBottom: '18px' }}
           />
 
           <TextField
             label="Year of Graduation"
-            name="year"
-            value={resume.year || ""}
-            onChange={(e) =>
-              setResume({
-                ...resume,
-                year: e.target.value,
-              })
-            }
+            placeholder="Enter graduation year"
             variant="standard"
             fullWidth
-            sx={{ mb: 3 }}
+            value={resume?.year}
+            onChange={e => setResume({ ...resume, year: e.target.value })}
+            sx={{ marginBottom: '30px' }}
           />
 
-          {/* Technical Skills */}
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: 'bold',
+              marginBottom: '20px'
+            }}
+          >
+            skills
 
-          <Typography variant="h5" sx={{ mb: 2, fontWeight: "bold" }}>
-            Technical Skills
           </Typography>
 
-          <TextField
-            label="Skills"
-            name="skills"
-            value={
-            resume.skills || ""
-            }
-            onChange={(e) =>
-              setResume({
-                ...resume,
-                skills: e.target.value,
-              })
-            }
-            variant="standard"
-            fullWidth
-            sx={{ mb: 3 }}
-          />
+          <TextField inputRef={inputRef} />
 
-          {/* Summary */}
 
-          <Typography variant="h5" sx={{ mb: 2, fontWeight: "bold" }}>
+
+          <Button onClick={() => handleAddSkills(inputRef.current.value)}>add skills</Button>
+          <Box>
+            {
+              resume?.skills?.map(item => (
+                <Button>{item} <span onClick={() => handleDeleteSkills(item)}><ClearIcon /></span> </Button>
+              ))
+            }
+          </Box>
+
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: 'bold',
+              marginBottom: '20px'
+            }}
+          >
             Summary
           </Typography>
 
           <TextField
             label="Professional Summary"
-            name="summary"
-            value={resume.summary || ""}
-            onChange={(e) =>
-              setResume({
-                ...resume,
-                summary: e.target.value,
-              })
-            }
+            placeholder="Enter your professional summary"
             multiline
             rows={4}
             variant="standard"
             fullWidth
-            sx={{ mb: 3 }}
+            sx={{ marginBottom: '30px' }}
           />
-
-          {/* Buttons */}
 
           <Button
             variant="contained"
-            onClick={handleUpdate}
+            onClick={handleUpdateResume}
             sx={{
-              backgroundColor: "#684f56",
-              fontWeight: "bold",
-              padding: "10px 20px",
-              "&:hover": {
-                backgroundColor: "#563f46",
-              },
+              backgroundColor: '#684f56',
+              fontWeight: 'bold',
+              padding: '10px 20px',
+
+              '&:hover': {
+                backgroundColor: '#563f46'
+              }
             }}
           >
             UPDATE CV
           </Button>
 
-          <Button onClick={handleUpdateResume} sx={{ ml: 2 }}>
-            CANCEL
-          </Button>
         </Box>
       </Modal>
     </>
-  );
+  )
 }
 
-export default Edit;
+export default Edit

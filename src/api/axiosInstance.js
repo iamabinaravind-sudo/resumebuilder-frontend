@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const instance = axios.create({
-  baseURL: "http://localhost:3000",
+  baseURL: "https://resumebuilderbackend-gb0j.onrender.com",
   timeout: 5000,
 });
 

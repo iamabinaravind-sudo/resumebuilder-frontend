@@ -1,10 +1,13 @@
-import React from 'react'
-import { Typography } from '@mui/material'
-import Paper from '@mui/material/Paper';
+import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
-
+import { getDownloads } from '../services/apiServices';
+import { deleteDownloadsAPI } from '../services/apiServices';
+import { Pie, PieChart, Tooltip } from 'recharts';
+// import { RechartsDevtools } from '@recharts/devtools';
 
 const style = {
   position: 'absolute',
@@ -18,83 +21,181 @@ const style = {
   p: 4,
 };
 
+function Download({ isAnimationActive = true }) {
+  const [open, setOpen] = useState(false);
+  const [allDownloads, setAllDownloads] = useState([]);
 
-
-function Download() {
-
-
- const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
+  const getDownload = async () => {
+    try {
+      const response = await getDownloads();
 
+      console.log(response.data);
+      setAllDownloads(response.data);
+    } catch (error) {
+      console.error('Failed to fetch downloads:', error);
+    }
+  };
+
+  useEffect(() => {
+    getDownload();
+  }, []);
+
+
+const deleteDownloads= async (id)=>{
+try{
+const response= await deleteDownloadsAPI(id)
+console.log(response);
+getDownload()
+
+}
+catch(error){
+console.log(error);
+
+}
+
+}
 
   return (
     <div>
-  
-
-        <Typography
-          sx={{
-            textAlign: "center",
-            fontSize: "55px",
-            fontWeight: "bold",
-            mt: 8,
-            mb: 8
-          }}
-        >
-         All Downloaded Resume Details
-        </Typography>
-
-
-
-        <Typography
-          sx={{
-            fontSize: "30px",
-            lineHeight: 1.6,
-            mt:10,
-            mb: 8
-          }}
-        >
-         Total downloaded resume from our site is 10
-        </Typography>
-
-        
-<Button variant="contained" onClick={handleOpen}>Viewchart</Button>
-  <Modal
+      <Modal
         open={open}
         onClose={handleClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-        Resume Download count by job role
+          <Typography
+            id="modal-modal-title"
+            variant="h6"
+            component="h2"
+            sx={{
+              backgroundColor: 'gray',
+              textAlign: 'center',
+              p: 1,
+            }}
+          >
+            Resume download count by job role
           </Typography>
+
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-          Graph
+            Graph
           </Typography>
+           <PieChart width={400} height={400}>
+      <Pie
+        activeShape={{
+          fill: 'red',
+        }}
+        data={[
+          { name: 'Page A', uv: 590 },
+          { name: 'Page B', uv: 590 },
+          { name: 'Page C', uv: 868 },
+        ]}
+        dataKey="uv"
+        isAnimationActive={isAnimationActive}
+      />
+      <Tooltip defaultIndex={2} />
+      {/* <RechartsDevtools /> */}
+    </PieChart>
         </Box>
       </Modal>
 
+      <Typography
+        sx={{
+          textAlign: 'left',
+          fontSize: '30px',
+          fontWeight: 'bold',
+          mt: 8,
+          mb: 8,
+          px: 5,
+        }}
+      >
+        All downloaded resumes here
+      </Typography>
 
-<Box
-      sx={{
-        display: 'flex',
-        flexWrap: 'wrap',
-        '& > :not(style)': {
-          m: 4,
-          width: 400,
-          height: 400,
-        },
-      }}
-    >
-    <Paper elevation={3} />
-     <Paper elevation={3} />
-      <Paper elevation={3} />
-    </Box>
+      <Typography
+        sx={{
+          textAlign: 'left',
+          fontSize: '30px',
+          mt: 8,
+          mb: 8,
+          px: 5,
+        }}
+      >
+        Total number of resumes downloaded from our site: {allDownloads.length}
+      </Typography>
 
+      <Button
+        variant="contained"
+        sx={{
+          backgroundColor: '#80502f',
+          color: 'white',
+          fontFamily: 'Georgia, serif',
+          fontWeight: 'bold',
+          fontSize: '14px',
+          px: 2,
+          py: 1,
+          borderRadius: '6px',
+          '&:hover': {
+            backgroundColor: '#623b23',
+          },
+        }}
+        onClick={handleOpen}
+      >
+        View Chart
+      </Button>
+
+      <Box
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          '& > div': {
+            m: 5,
+            width: 400,
+            minHeight: 200,
+            py: '10px',
+          },
+        }}
+      >
+        {allDownloads.length > 0 ? (
+          allDownloads.map((item) => (
+            <div key={item.id}>
+              <Paper elevation={3} sx={{ p: 2 }}>
+                <img
+                  src={item.imgUrl}
+                  width="300"
+                  alt="Downloaded resume"
+                  style={{
+                    maxWidth: '100%',
+                    height: 'auto',
+                    display: 'block',
+                  }}
+                  
+                />
+
+<Button
+  variant="contained"
+  color="error"
+  onClick={() => deleteDownloads(item.id)}
+>
+  Delete
+</Button>
+
+              </Paper>
+
+
+            </div>
+          ))
+        ) : (
+          <Typography sx={{ m: 5 }}>
+            No downloaded resumes found.
+          </Typography>
+        )}
+      </Box>
     </div>
-  )
+  );
 }
 
-export default Download
+export default Download;

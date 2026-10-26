@@ -16,10 +16,13 @@
     "@mui/material": "^9.4.0",
     "axios": "^1.20.0",
     "bootstrap": "^5.3.8",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^4.2.1",
     "react": "^19.3.0",
     "react-bootstrap": "^2.10.10",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.4",
+    "recharts": "^3.10.1",
     "router-dom": "^3.3.8"
   },
   "devDependencies": {

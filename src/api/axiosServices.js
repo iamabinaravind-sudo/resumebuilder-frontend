@@ -1,18 +1,15 @@
+import axios from 'axios';
 
-import instance from "./axiosInstance";
+const axiosInstance = axios.create({
+  baseURL: 'http://localhost:3000',
+});
 
-const axiosService = async (httpMethod, url, reqBody) => {
-  try {
-    const response = await instance({
-      method: httpMethod,
-      url: url,
-      data: reqBody,
-    });
-
-    return response;
-  } catch (err) {
-    throw err;
-  }
+const axiosService = async (method, url, reqBody = {}) => {
+  return await axiosInstance({
+    method,
+    url,
+    data: reqBody,
+  });
 };
 
 export default axiosService;
